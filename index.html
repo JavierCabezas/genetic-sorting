@@ -1,21 +1,37 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="assets/pure.min.css"/>
+    </head>
     <body>
+        <div class="pure-form">
 
-    <form action="genetic.php" method="POST" enctype="multipart/form-data">
-        <label for="archivo_a_subir"> archivo Excel: </label>
-        <input type="file" accept=".xlsx" name="excel_alumnos" id="archivo_a_subir" required>
+            <h2>Form subida archivo </h2>
 
-        <label for="personas_por_grupo"> Número de personas por grupo: </label>
-        <input type="number" name="personas_por_grupo" id="personas_por_grupo" required>
+            <form class="pure-form pure-form-aligned"
+                  action="reader.php"
+                  method="POST"
+                  enctype="multipart/form-data"
+            >
+                <fieldset>
+                    <div class="pure-control-group">
+                        <label for="archivo_a_subir">Archivo Excel</label>
+                        <input type="file" accept=".xlsx" name="excel_alumnos" id="archivo_a_subir" required>
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="personas_por_grupo">Número de personas por grupo:</label>
+                        <input type="number" id="personas_por_grupo" name="personas_por_grupo" required />
+                    </div>
+                    <div class="pure-controls">
+                        <button type="submit" class="pure-button pure-button-primary">Subir</button>
+                    </div>
+                </fieldset>
+            </form>
 
-        <input type="submit" value="Subir Excel" name="submit">
-    </form>
-
-
-    <script>
-        document.getElementById('personas_por_grupo').value = 3;
-    </script>
-
+            <script>
+                document.getElementById('personas_por_grupo').value = 3;
+            </script>
+        </div>
     </body>
 </html>
