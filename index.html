@@ -16,12 +16,12 @@
             >
                 <fieldset>
                     <div class="pure-control-group">
-                        <label for="archivo_a_subir">Archivo Excel</label>
-                        <input type="file" accept=".xlsx" name="excel_alumnos" id="archivo_a_subir" required>
+                        <label for="file_to_upload">Archivo Excel</label>
+                        <input type="file" accept=".xlsx" name="file_to_upload" id="file_to_upload" required>
                     </div>
                     <div class="pure-control-group">
-                        <label for="personas_por_grupo">Número de personas por grupo:</label>
-                        <input type="number" id="personas_por_grupo" name="personas_por_grupo" required />
+                        <label for="persons_per_group">Número de personas por grupo:</label>
+                        <input type="number" id="persons_per_group" name="persons_per_group" required />
                     </div>
                     <div class="pure-controls">
                         <button type="submit" class="pure-button pure-button-primary">Subir</button>
@@ -30,7 +30,7 @@
             </form>
 
             <script>
-                document.getElementById('personas_por_grupo').value = 3;
+                document.getElementById('persons_per_group').value = 3;
             </script>
         </div>
     </body>
