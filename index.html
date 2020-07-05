@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <body>
+
+    <form action="genetic.php" method="POST" enctype="multipart/form-data">
+        <label for="archivo_a_subir"> archivo Excel: </label>
+        <input type="file" accept=".xlsx" name="excel_alumnos" id="archivo_a_subir" required>
+
+        <label for="personas_por_grupo"> Número de personas por grupo: </label>
+        <input type="number" name="personas_por_grupo" id="personas_por_grupo" required>
+
+        <input type="submit" value="Subir Excel" name="submit">
+    </form>
+
+
+    <script>
+        document.getElementById('personas_por_grupo').value = 3;
+    </script>
+
+    </body>
+</html>
