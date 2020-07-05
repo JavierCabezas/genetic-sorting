@@ -1,0 +1,10 @@
+version: '2'
+services:
+  webserver:
+    image: phpstorm/php-73-apache-xdebug-27
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html
+    environment:
+      XDEBUG_CONFIG: remote_host=192.168.0.105
