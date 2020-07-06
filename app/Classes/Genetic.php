@@ -10,11 +10,15 @@ class Genetic
     private $numStudentsPerGroup;
     /** @var array $groups */
     private $groups;
+    /** @var int $currentScore */
+    private $currentScore;
     
     const SCORE_PREF_1   = 3;
     const SCORE_PREF_2   = 1;
     const SCORE_DEPREF_1 = -3;
     const SCORE_DEPREF_2 = -1;
+    
+    const NUMBER_OF_LOOPS = 10000;
     
     /**
      * Genetic constructor.
@@ -29,9 +33,48 @@ class Genetic
     
     public function calculate()
     {
-        $initialPopulation = $this->createRandomGroup($this->studentsClass->getStudentsCacheDict());
-        $score             = $this->getGroupScore($initialPopulation);
-        echo "";
+        $studentIdxArray    = array_values($this->studentsClass->getStudentsCacheDict());
+        $initialPopulation  = $this->createRandomGroup($studentIdxArray);
+        $populationSize     = count($studentIdxArray);
+        $this->groups       = $initialPopulation;
+        $this->currentScore = $this->getGroupScore($initialPopulation);
+        
+        for ($loopNumber = 0; $loopNumber < self::NUMBER_OF_LOOPS; $loopNumber += 1) {
+            if($loopNumber % 100 === 0) {
+                echo "<p>loop #$loopNumber</p>";
+            }
+            $candidateGroup = $this->createGroupByCrossingOver($this->groups, $populationSize, $this->numStudentsPerGroup);
+            $candidateScore = $this->getGroupScore($candidateGroup);
+            if ($candidateScore > $this->currentScore) {
+                echo "<p>loop #$loopNumber switch ".$candidateScore . "y ". $this->currentScore."</p>";
+                $this->groups       = $candidateGroup;
+                $this->currentScore = $candidateScore;
+            }
+        }
+    }
+    
+    /**
+     * @param array $groupToCrossover
+     * @param int   $numberOfElements
+     * @param int   $groupSize
+     * @return array
+     */
+    private function createGroupByCrossingOver(array $groupToCrossover, int $numberOfElements, int $groupSize): array
+    {
+        $numberOfFlips = mt_rand(1, $numberOfElements);
+        for ($i = 0; $i < $numberOfFlips; $i++) {
+            $firstIdxStudentToFlip   = mt_rand(1, $numberOfElements);
+            $secondIdxStudentToFlip  = mt_rand(1, $numberOfElements);
+            $firstElementGroupIdx    = ceil($firstIdxStudentToFlip / $groupSize) - 1;
+            $secondElementGroupIdx   = ceil($secondIdxStudentToFlip / $groupSize) - 1;
+            $firstGroupElementIndex  = mt_rand(0, count($groupToCrossover[$firstElementGroupIdx]) - 1);
+            $secondGroupElementIndex = mt_rand(0, count($groupToCrossover[$secondElementGroupIdx]) - 1);
+            
+            $temp                                                               = $groupToCrossover[$firstElementGroupIdx][$firstGroupElementIndex];
+            $groupToCrossover[$firstElementGroupIdx][$firstGroupElementIndex]   = $groupToCrossover[$secondElementGroupIdx][$secondGroupElementIndex];
+            $groupToCrossover[$secondElementGroupIdx][$secondGroupElementIndex] = $temp;
+        }
+        return $groupToCrossover;
     }
     
     /**
@@ -55,10 +98,12 @@ class Genetic
     private function getScoreBetweenIdStudents(int $originStudentIdx, int $studentIdxToCheck): int
     {
         $preferences = $this->studentsClass->getStudents()[$originStudentIdx][Students::INDEX_PREFERENCES];
-        return $preferences[Students::INDEX_PREFERENCES_PREFERENCE_1] === $studentIdxToCheck ? self::SCORE_PREF_1 : 0 +
-        $preferences[Students::INDEX_PREFERENCES_PREFERENCE_2] === $studentIdxToCheck ? self::SCORE_PREF_2 : 0 +
-        $preferences[Students::INDEX_PREFERENCES_DEPREF_1] === $studentIdxToCheck ? self::SCORE_DEPREF_1 : 0 +
-        $preferences[Students::INDEX_PREFERENCES_DEPREF_2] === $studentIdxToCheck ? self::SCORE_DEPREF_2 : 0;
+        return (
+            $preferences[Students::INDEX_PREFERENCES_PREFERENCE_1] === $studentIdxToCheck ? self::SCORE_PREF_1 : 0 +
+            $preferences[Students::INDEX_PREFERENCES_PREFERENCE_2] === $studentIdxToCheck ? self::SCORE_PREF_2 : 0 +
+            $preferences[Students::INDEX_PREFERENCES_DEPREF_1] === $studentIdxToCheck ? self::SCORE_DEPREF_1 : 0 +
+            $preferences[Students::INDEX_PREFERENCES_DEPREF_2] === $studentIdxToCheck ? self::SCORE_DEPREF_2 : 0
+        );
     }
     
     /**
