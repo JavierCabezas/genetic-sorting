@@ -18,7 +18,7 @@ class Genetic
     const SCORE_DEPREF_1 = -3;
     const SCORE_DEPREF_2 = -1;
     
-    const NUMBER_OF_LOOPS = 10000;
+    const NUMBER_OF_LOOPS = 1000;
     
     /**
      * Genetic constructor.
@@ -31,7 +31,7 @@ class Genetic
         $this->studentsClass       = $students;
     }
     
-    public function calculate()
+    public function calculate() : array
     {
         $studentIdxArray    = array_values($this->studentsClass->getStudentsCacheDict());
         $initialPopulation  = $this->createRandomGroup($studentIdxArray);
@@ -51,6 +51,8 @@ class Genetic
                 $this->currentScore = $candidateScore;
             }
         }
+        
+        return $this->groups;
     }
     
     /**
