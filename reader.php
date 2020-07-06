@@ -2,6 +2,7 @@
 require __DIR__ . '/vendor/autoload.php';
 
 use App\Classes\Students;
+use App\Classes\Genetic;
 
 if (isset($_FILES["file_to_upload"], $_POST["persons_per_group"])) {
     $excelFile       = $_FILES["file_to_upload"]["tmp_name"];
@@ -13,8 +14,7 @@ if (isset($_FILES["file_to_upload"], $_POST["persons_per_group"])) {
             array_push($matrix, $row);
         }
         array_shift($matrix); //Delete headers
-        $studentsClass = new Students($matrix, $personsPerGroup);
-        
-        
+        $studentsClass = new Students($matrix);
+        $genetic       = new Genetic($studentsClass, $personsPerGroup);
     }
 }
