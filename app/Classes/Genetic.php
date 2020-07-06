@@ -18,7 +18,7 @@ class Genetic
     const SCORE_DEPREF_1 = -3;
     const SCORE_DEPREF_2 = -1;
     
-    const NUMBER_OF_LOOPS = 1000;
+    const NUMBER_OF_LOOPS = 10000;
     
     /**
      * Genetic constructor.
