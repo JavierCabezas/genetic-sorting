@@ -16,5 +16,6 @@ if (isset($_FILES["file_to_upload"], $_POST["persons_per_group"])) {
         array_shift($matrix); //Delete headers
         $studentsClass = new Students($matrix);
         $genetic       = new Genetic($studentsClass, $personsPerGroup);
+        $genetic->calculate();
     }
 }

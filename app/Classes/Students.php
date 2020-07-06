@@ -102,4 +102,18 @@ class Students
             }
         }
     }
+    
+    /**
+     * @return array
+     */
+    public function getStudents() : array {
+        return $this->students;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getStudentsCacheDict() : array {
+        return $this->studentCacheDict;
+    }
 }
