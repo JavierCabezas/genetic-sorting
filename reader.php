@@ -29,25 +29,74 @@ if (isset($_FILES["file_to_upload"], $_POST["persons_per_group"])) {
     <link rel="stylesheet" type="text/css" href="assets/pure.min.css"/>
 </head>
 <body>
+<div class="pure-g">
+    <div class="pure-u-5-5">
+        <h2>Datos de entrada:</h2>
 
-<table class="pure-table">
-    <thead>
-    <tr>
-        <th>Número de grupo</th>
-        <th>Estudiante</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php foreach ($selectedGroups as $groupKey => $group): ?>
-        <?php foreach ($group as $studentIndex): ?>
+        <ul>
+            <li><b>Personas por grupo: </b> <?= $personsPerGroup ?> </li>
+            <li><b>Número de personas: </b> <?= count($studentsClass->getStudentsCacheDict()) ?> </li>
+            <li><b>Número de grupos: </b> <?= ceil(count($studentsClass->getStudentsCacheDict()) / $personsPerGroup) ?> </li>
+        </ul>
+
+        <table class="pure-table pure-table-bordered pure-table-striped">
+            <thead>
             <tr>
-                <td> Grupo #<?= $groupKey + 1 ?> </td>
-                <td> <?= $studentsClass->getStudents()[$studentIndex][Students::INDEX_NAME] ?> </td>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Primera preferencia</th>
+                <th>Segunda preferencia</th>
+                <th>Primera de-preferencia</th>
+                <th>Segunda de-preferencia</th>
             </tr>
-        <?php endforeach; ?>
+            </thead>
+            <tbody>
+            <?php foreach ($matrix as $rowIdx => $row): ?>
+                <tr>
+                    <td><?= ($rowIdx + 1) ?></td>
+                    <td><?= $row[Students::EXCEL_COL_INDEX_NAME] ?> </td>
+                    <td><?= $row[Students::EXCEL_COL_INDEX_PREF_1] ?> </td>
+                    <td><?= $row[Students::EXCEL_COL_INDEX_PREF_2] ?> </td>
+                    <td><?= $row[Students::EXCEL_COL_INDEX_NOPREF_1] ?> </td>
+                    <td><?= $row[Students::EXCEL_COL_INDEX_NOPREF_2] ?> </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<h1>Datos de salida:</h1>
+
+<h3> Puntaje solución: <b><?= $genetic->getGroupScore($selectedGroups) ?> </b></h3>
+
+<div class="pure-g">
+    <?php foreach ($selectedGroups as $groupKey => $group): ?>
+        <div class="pure-u-1-3">
+            <h2>Grupo <?= ($groupKey + 1) ?> </h2>
+            <table class="pure-table pure-table-bordered pure-table-striped">
+                <thead>
+                <tr>
+                    <th>Persona</th>
+                    <th>Puntaje</th>
+                </tr>
+                <tbody>
+                <?php foreach ($group as $studentIndex): ?>
+                    <tr>
+                        <td><?= $studentsClass->getStudents()[$studentIndex][Students::INDEX_NAME] ?></td>
+                        <td><?= $genetic->getScoreFromStudentPerspective($group, $studentIndex) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+            <p><b>Puntaje grupo:</b> <?= $genetic->getSubGroupScore($group) ?> </p>
+
+        </div>
     <?php endforeach; ?>
-    </tbody>
-</table>
+</div>
 
 </body>
 </html>

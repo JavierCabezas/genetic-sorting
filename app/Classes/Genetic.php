@@ -2,6 +2,11 @@
 
 use App\Classes\Students;
 
+/**
+ * This class calculates the score of the given student group with a sort-of genetic algorithm
+ * Class Genetic
+ * @package App\Classes
+ */
 class Genetic
 {
     /** @var \App\Classes\Students $studentsClass */
@@ -13,12 +18,19 @@ class Genetic
     /** @var int $currentScore */
     private $currentScore;
     
-    const SCORE_PREF_1   = 3;
-    const SCORE_PREF_2   = 1;
-    const SCORE_DEPREF_1 = -3;
+    const SCORE_PREF_1   = 5;
+    const SCORE_PREF_2   = 3;
+    const SCORE_DEPREF_1 = -5;
     const SCORE_DEPREF_2 = -1;
     
     const NUMBER_OF_LOOPS = 10000;
+    
+    const INDEX_SCORE_ARRAY = [
+        Students::INDEX_PREFERENCES_PREFERENCE_1 => self::SCORE_PREF_1,
+        Students::INDEX_PREFERENCES_PREFERENCE_2 => self::SCORE_PREF_2,
+        Students::INDEX_PREFERENCES_DEPREF_1     => self::SCORE_DEPREF_1,
+        Students::INDEX_PREFERENCES_DEPREF_2     => self::SCORE_DEPREF_2,
+    ];
     
     /**
      * Genetic constructor.
@@ -31,7 +43,11 @@ class Genetic
         $this->studentsClass       = $students;
     }
     
-    public function calculate() : array
+    /**
+     * This class loops and creates new student groups and selects the best one
+     * @return array
+     */
+    public function calculate(): array
     {
         $studentIdxArray    = array_values($this->studentsClass->getStudentsCacheDict());
         $initialPopulation  = $this->createRandomGroup($studentIdxArray);
@@ -40,13 +56,9 @@ class Genetic
         $this->currentScore = $this->getGroupScore($initialPopulation);
         
         for ($loopNumber = 0; $loopNumber < self::NUMBER_OF_LOOPS; $loopNumber += 1) {
-            if($loopNumber % 100 === 0) {
-                echo "<p>loop #$loopNumber</p>";
-            }
             $candidateGroup = $this->createGroupByCrossingOver($this->groups, $populationSize, $this->numStudentsPerGroup);
             $candidateScore = $this->getGroupScore($candidateGroup);
             if ($candidateScore > $this->currentScore) {
-                echo "<p>loop #$loopNumber switch ".$candidateScore . "y ". $this->currentScore."</p>";
                 $this->groups       = $candidateGroup;
                 $this->currentScore = $candidateScore;
             }
@@ -56,6 +68,7 @@ class Genetic
     }
     
     /**
+     * Flips some elements of the student group and returns a new group
      * @param array $groupToCrossover
      * @param int   $numberOfElements
      * @param int   $groupSize
@@ -80,6 +93,7 @@ class Genetic
     }
     
     /**
+     * Generates a random student group
      * @param array    $studentIdxArray array of elements to place into groups
      * @param int|null $studentsPerGroup if null it will select the default students per group value
      * @return array
@@ -100,16 +114,39 @@ class Genetic
     private function getScoreBetweenIdStudents(int $originStudentIdx, int $studentIdxToCheck): int
     {
         $preferences = $this->studentsClass->getStudents()[$originStudentIdx][Students::INDEX_PREFERENCES];
-        return (
-            $preferences[Students::INDEX_PREFERENCES_PREFERENCE_1] === $studentIdxToCheck ? self::SCORE_PREF_1 : 0 +
-            $preferences[Students::INDEX_PREFERENCES_PREFERENCE_2] === $studentIdxToCheck ? self::SCORE_PREF_2 : 0 +
-            $preferences[Students::INDEX_PREFERENCES_DEPREF_1] === $studentIdxToCheck ? self::SCORE_DEPREF_1 : 0 +
-            $preferences[Students::INDEX_PREFERENCES_DEPREF_2] === $studentIdxToCheck ? self::SCORE_DEPREF_2 : 0
-        );
+        $score       = 0;
+        foreach (self::INDEX_SCORE_ARRAY as $studentPreferenceIndex => $givenScore) {
+            $score += $preferences[$studentPreferenceIndex] === $studentIdxToCheck ? $givenScore : 0;
+        }
+        return $score;
     }
     
     /**
-     * Calculates the score of a given group
+     * @param array $subGroup
+     * @return int
+     */
+    public function getSubGroupScore(array $subGroup): int
+    {
+        $totalScore = 0;
+        //The score is the sum for each of the individual scores on the $group variable
+        //$group is an array that contains idStudents
+        foreach ($subGroup as $originIdStudent) {
+            foreach (array_values($subGroup) as $idStudentToCheck) {
+                if ($idStudentToCheck === $originIdStudent) {
+                    $totalScore += 0;
+                } else {
+                    $totalScore += $this->getScoreBetweenIdStudents($originIdStudent, $idStudentToCheck);
+                }
+            }
+        }
+        
+        return $totalScore;
+    }
+    
+    /**
+     * Calculates the score of a given group.
+     * The algorithm chekcs out the students preferences and adds a positive score by each met preference and
+     * substracts a score by each de-preference.
      * @param array $groups array in the format [
      *      [idxStudent1, idxStudent2, ...] ,
      *      [idxStudent3, idxStudent4, ...] ,
@@ -117,20 +154,26 @@ class Genetic
      * ]
      * @return int
      */
-    private function getGroupScore(array $groups): int
+    public function getGroupScore(array $groups): int
     {
         $totalScore = 0;
         foreach ($groups as $group) {
-            //The score is the sum for each of the individual scores on the $group variable
-            //$group is an array that contains idStudents
-            foreach ($group as $originIdStudent) {
-                foreach (array_values($group) as $idStudentToCheck) {
-                    if ($idStudentToCheck === $originIdStudent) {
-                        $totalScore += 0;
-                    } else {
-                        $totalScore += $this->getScoreBetweenIdStudents($originIdStudent, $idStudentToCheck);
-                    }
-                }
+            $totalScore += $this->getSubGroupScore($group);
+        }
+        return $totalScore;
+    }
+    
+    /**
+     * @param array $studentArray
+     * @param int   $idOriginStudent
+     * @return int
+     */
+    public function getScoreFromStudentPerspective(array $studentArray, int $idOriginStudent): int
+    {
+        $totalScore = 0;
+        foreach ($studentArray as $studentIdx) {
+            if ($idOriginStudent !== $studentIdx) {
+                $totalScore += $this->getScoreBetweenIdStudents($idOriginStudent, $studentIdx);
             }
         }
         return $totalScore;
