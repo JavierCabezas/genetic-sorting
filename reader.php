@@ -71,7 +71,17 @@ if (isset($_FILES["file_to_upload"], $_POST["persons_per_group"])) {
 
 <h1>Datos de salida:</h1>
 
-<h3> Puntaje solución: <b><?= $genetic->getGroupScore($selectedGroups) ?> </b></h3>
+<h3> Puntaje solución: <b><?= $genetic->getGroupsScore($selectedGroups) ?> </b></h3>
+
+<ul>
+    <li> Desviación estándar solución: <b> <?= round($genetic->getGroupStandardDeviation($selectedGroups), 2) ?></b></li>
+    <li> Número de loops: <b> <?= Genetic::NUMBER_OF_LOOPS ?></b></li>
+    <li> Mejoras hechas: <b> <?= $genetic->candidateSwitches ?></b></li>
+    <li> Puntaje preferencia 1: <b> <?= Genetic::SCORE_PREF_1 ?></b></li>
+    <li> Puntaje preferencia 2: <b> <?= Genetic::SCORE_PREF_2 ?></b></li>
+    <li> Puntaje de-preferencia 1: <b> <?= Genetic::SCORE_DEPREF_1 ?></b></li>
+    <li> Puntaje de-preferencia 2: <b> <?= Genetic::SCORE_DEPREF_2 ?></b></li>
+</ul>
 
 <div class="pure-g">
     <?php foreach ($selectedGroups as $groupKey => $group): ?>

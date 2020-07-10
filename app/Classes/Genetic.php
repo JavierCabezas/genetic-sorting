@@ -17,13 +17,15 @@ class Genetic
     private $groups;
     /** @var int $currentScore */
     private $currentScore;
+    /** @var int $candidateSwitches */
+    public $candidateSwitches;
     
-    const SCORE_PREF_1   = 5;
-    const SCORE_PREF_2   = 4;
-    const SCORE_DEPREF_1 = -3;
-    const SCORE_DEPREF_2 = -1;
+    const SCORE_PREF_1   = 3;
+    const SCORE_PREF_2   = 2;
+    const SCORE_DEPREF_1 = -6;
+    const SCORE_DEPREF_2 = -4;
     
-    const NUMBER_OF_LOOPS = 50000;
+    const NUMBER_OF_LOOPS = 5000;
     
     const INDEX_SCORE_ARRAY = [
         Students::INDEX_PREFERENCES_PREFERENCE_1 => self::SCORE_PREF_1,
@@ -49,18 +51,33 @@ class Genetic
      */
     public function calculate(): array
     {
-        $studentIdxArray    = array_values($this->studentsClass->getStudentsCacheDict());
-        $initialPopulation  = $this->createRandomGroup($studentIdxArray);
-        $populationSize     = count($studentIdxArray);
-        $this->groups       = $initialPopulation;
-        $this->currentScore = $this->getGroupScore($initialPopulation);
+        $studentIdxArray         = array_values($this->studentsClass->getStudentsCacheDict());
+        $initialPopulation       = $this->createRandomGroup($studentIdxArray);
+        $populationSize          = count($studentIdxArray);
+        $this->groups            = $initialPopulation;
+        $this->currentScore      = $this->getGroupsScore($initialPopulation);
+        $this->candidateSwitches = 0;
         
         for ($loopNumber = 0; $loopNumber < self::NUMBER_OF_LOOPS; $loopNumber += 1) {
             $candidateGroup = $this->createGroupByCrossingOver($this->groups, $populationSize, $this->numStudentsPerGroup);
-            $candidateScore = $this->getGroupScore($candidateGroup);
+            $candidateScore = $this->getGroupsScore($candidateGroup);
+            $shouldSwitch   = false;
             if ($candidateScore > $this->currentScore) {
-                $this->groups       = $candidateGroup;
-                $this->currentScore = $candidateScore;
+                $shouldSwitch = true;
+            } elseif ($candidateScore === $this->currentScore) {
+                //If the scores are the same, check if the candidate group is better by other criteria
+                
+                //If the candidate group has a lower standard deviation than the current group then chose that one
+                // (becase we don't want to have a group with high score and other one with way lower score)
+                $currentStd   = $this->getGroupStandardDeviation($this->groups);
+                $candidateStd = $this->getGroupStandardDeviation($candidateGroup);
+                $shouldSwitch = $candidateStd < $currentStd;
+            }
+            
+            if ($shouldSwitch) {
+                $this->groups            = $candidateGroup;
+                $this->currentScore      = $candidateScore;
+                $this->candidateSwitches += 1;
             }
         }
         
@@ -154,13 +171,32 @@ class Genetic
      * ]
      * @return int
      */
-    public function getGroupScore(array $groups): int
+    public function getGroupsScore(array $groups): int
     {
         $totalScore = 0;
         foreach ($groups as $group) {
             $totalScore += $this->getSubGroupScore($group);
         }
         return $totalScore;
+    }
+    
+    /**
+     * @param array $groups
+     * @return float
+     */
+    public function getGroupStandardDeviation(array $groups): float
+    {
+        $groupsScores = array_map(function (array $group) {
+            return $this->getSubGroupScore($group);
+        }, $groups);
+        
+        $num_of_elements = count($groupsScores);
+        $variance        = 0.0;
+        $average         = array_sum($groupsScores) / $num_of_elements;
+        foreach ($groupsScores as $i) {
+            $variance += pow(($i - $average), 2);
+        }
+        return (float)sqrt($variance / $num_of_elements);
     }
     
     /**
@@ -178,5 +214,4 @@ class Genetic
         }
         return $totalScore;
     }
-    
 }
