@@ -25,7 +25,7 @@ class Genetic
     const SCORE_DEPREF_1 = -6;
     const SCORE_DEPREF_2 = -4;
     
-    const NUMBER_OF_LOOPS = 5000;
+    const NUMBER_OF_LOOPS = 50000;
     
     const INDEX_SCORE_ARRAY = [
         Students::INDEX_PREFERENCES_PREFERENCE_1 => self::SCORE_PREF_1,
