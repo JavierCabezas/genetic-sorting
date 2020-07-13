@@ -18,6 +18,10 @@ if (isset($_FILES["file_to_upload"], $_POST["persons_per_group"])) {
         $genetic        = new Genetic($studentsClass, $personsPerGroup);
         $selectedGroups = $genetic->calculate();
     }
+} else {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+    $domainName = $_SERVER['HTTP_HOST'].'/';
+    header('Location: ' . $protocol.$domainName);
 }
 ?>
 
