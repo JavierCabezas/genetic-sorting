@@ -53,13 +53,14 @@ class Students
     {
         $this->fillStudents($matrix);
         $this->fillPreferences($matrix);
+        echo "";
     }
     
     /**
      * @param string $studentName
      * @return bool|mixed
      */
-    private function getIndexFromStudentName(string $studentName)
+    public function getIndexFromStudentName(string $studentName)
     {
         return $this->studentCacheDict[$studentName] ?? null;
     }
