@@ -27,3 +27,12 @@ If the score is the same then the standard deviation of each of the student sub-
 then this solution is considered greater and is swapped. The idea behind the standard deviation is that, even if the score is the same, having groups with similar 
 score is preferable before having groups with a great dispersion of scores.
 4) This is looped N times.
+
+TO-DOs:
+ * Actually implement the tests (they are a WIP)
+ * Improve the code legibility and comments
+ * Translate everything to english (there is some spanish somewhere)
+ * (and the most important one) Make the software more flexible, so it can read n preferences and de-preferences
+ from the Excel file.
+
+There are some example excel files in the "test" folder. They can be uploaded in http://armador-grupos.herokuapp.com/ to check the results.
