@@ -16,7 +16,6 @@ class Students
     const INDEX_NAME        = 'name';
     const INDEX_IDX_STUDENT = 'idxStudent';
     const INDEX_PREFERENCES = 'preferences';
-    const INDEX_IS_MATCHED  = 'isMatched';
     
     const INDEX_PREFERENCES_PREFERENCE_1 = 'pref1';
     const INDEX_PREFERENCES_PREFERENCE_2 = 'pref2';
@@ -77,8 +76,7 @@ class Students
             $this->students[$idxStudent]   = [
                 self::INDEX_NAME        => $name,
                 self::INDEX_IDX_STUDENT => $idxStudent,
-                self::INDEX_PREFERENCES => [],
-                self::INDEX_IS_MATCHED  => false,
+                self::INDEX_PREFERENCES => []
             ];
             $this->studentCacheDict[$name] = $idxStudent;
         }
